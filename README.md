@@ -7,6 +7,9 @@ The project also includes a **PostgreSQL trigger-based audit log** that captures
 
 ## 🏗️ Architecture Overview
 
+
+![Architecture Flow](./assets/architecture.gif)
+
 **Components:**
 - **PostgreSQL** — source database
 - **Debezium** — captures changes from Postgres WAL
@@ -52,7 +55,8 @@ The project also includes a **PostgreSQL trigger-based audit log** that captures
 
 ### 1. Clone the project
 ```bash
-git clone https://github.com/your-username/real-time-CDC-pipeline-with-postgres-kafka-telegram.git
+git clone https://github.com/zalihat/real-time-CDC-pipeline-with-postgres-kafka-telegram.git
+
 cd real-time-CDC-pipeline-with-postgres-kafka-telegram
 
 ```
@@ -67,7 +71,7 @@ docker compose up -d
 ```
 This starts:
 
-* PostgreSQL
+* PostgreSQL: 
 
 * Kafka Broker & Zookeeper
 
@@ -243,8 +247,6 @@ real-time-CDC-pipeline-with-postgres-kafka-telegram/
 
 ### 🧠 Notes
 
-Only update and delete operations trigger Telegram alerts.
+* Only update and delete operations trigger Telegram alerts.
 
-The audit trigger logs all operations for compliance.
-
-Make sure wal_level=logical is enabled in Postgres.
+* The audit trigger logs all operations for compliance.
