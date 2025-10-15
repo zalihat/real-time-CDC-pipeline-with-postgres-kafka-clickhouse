@@ -10,17 +10,6 @@ The project also includes a **PostgreSQL trigger-based audit log** that captures
 
 ![Architecture Flow](./assets/architecture.gif)
 
-**Components:**
-- **PostgreSQL** — source database
-- **Debezium** — captures changes from Postgres WAL
-- **Kafka** — transports CDC events
-- **Schema Registry** & **Control Center** — manage schemas and monitor pipelines
-- **Docker** — container orchestration
-- **Telegram Bot** — receives change notifications
-- **Custom Postgres Trigger** — creates detailed audit trail
-
-
-
 
 ---
 
@@ -69,17 +58,30 @@ docker buildx build --platform linux/amd64 -t cdcraft/kafka-connect:latest ./kaf
 ```
 docker compose up -d
 ```
-This starts:
+This starts the following containers:
 
-* PostgreSQL: 
+* PostgreSQL
 
-* Kafka Broker & Zookeeper
+    → Accessible on port 5432
 
-* Schema Registry
+    → You can connect using a client such as DBeaver with:
+```
+Host: localhost
 
-* Kafka Connect
+Port: 5432
 
-* Control Center
+User: postgres
+
+Password: postgres
+```
+* Kafka Broker & Zookeeper 
+
+* Schema Registry 
+
+* Kafka Connect 
+
+* Control Center — provides a web UI to monitor Kafka, topics, and connectors
+→ View it at http://localhost:8084
 
 ### 🗄️ Create a Test Database
 ```
@@ -197,6 +199,29 @@ SELECT * FROM audit.data_changes;
 The Telegram consumer listens to Kafka events and sends alerts.
 
 **Run the Python consumer:**
+
+* Create a Telegram bot
+
+    * In Telegram, search for @BotFather
+
+    * Send /newbot → follow instructions to get your bot token
+
+    * Get your chat ID: Open your bot in Telegram and send any message
+
+    * Visit:
+```
+https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+
+```
+
+   Find "chat":{"id":123456789} — that’s your CHAT_ID
+
+* Install dependencies
+```
+pip install confluent-kafka requests
+```
+
+* Run the script
 ```
 python telegram-consumer/kafka-telegram.py
 ```
