@@ -124,7 +124,7 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
   localhost:8083/connectors/ -d '@./connectors/source.json'
   ```
 
-###  Create the Audit Schema
+###  Create the Audit Schema  
 ```
 CREATE SCHEMA IF NOT EXISTS audit;
 

@@ -3,6 +3,7 @@ import json
 import requests
 from dotenv import load_dotenv
 import os
+import time
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,8 +22,24 @@ conf = {
 
 consumer = Consumer(conf)
 topic = "debezium.public.sales_test"
-consumer.subscribe([topic])
 
+# ====== WAIT UNTIL TOPIC EXISTS ======
+while True:
+    try:
+        metadata = consumer.list_topics(timeout=5)
+        if topic in metadata.topics:
+            print(f"Topic '{topic}' exists! Subscribing now...")
+            break
+        print(f"Waiting for topic '{topic}' to be created...")
+        time.sleep(5)
+    except KafkaException as e:
+        print(f"Error checking topic metadata: {e}")
+        time.sleep(5)
+
+consumer.subscribe([topic])
+print(f"Listening for messages on topic '{topic}'...")
+
+# ====== HELPER FUNCTIONS ======
 def send_telegram_alert(message: str):
     """Send a message to Telegram."""
     payload = {"chat_id": CHAT_ID, "text": message}
@@ -37,9 +54,11 @@ def format_alert(data):
     before = data.get("before")
     after = data.get("after")
 
+    # Skip inserts
     if op == "c":
-        msg = f"🟢 *New Record Added*\nCustomer: {after['customer_name']}\nItem: {after['item']}\nAmount: {after['amount']}"
-    elif op == "u":
+        return None
+
+    if op == "u":
         changes = []
         for key in after.keys():
             if before and before.get(key) != after.get(key):
@@ -49,27 +68,28 @@ def format_alert(data):
     elif op == "d":
         msg = f"🔴 *Record Deleted*\nCustomer: {before['customer_name']}\nItem: {before['item']}"
     else:
-        msg = f"ℹ️ Unknown operation: {op}"
+        return None  # ignore unknown operations
 
     return msg
 
-print(f"Listening for messages on topic '{topic}'...")
-
+# ====== CONSUMER LOOP ======
 try:
     while True:
         msg = consumer.poll(1.0)
         if msg is None:
             continue
         if msg.error():
-            raise KafkaException(msg.error())
+            print(f"Kafka error: {msg.error()}")
+            continue
 
         try:
             event = json.loads(msg.value().decode("utf-8"))
             payload = event.get("payload", {})
 
             alert_text = format_alert(payload)
-            print("\n" + alert_text)  # print locally
-            send_telegram_alert(alert_text)  # send to Telegram
+            if alert_text:  # only send if not None
+                print("\n" + alert_text)
+                send_telegram_alert(alert_text)
 
         except json.JSONDecodeError:
             print("Received non-JSON message:", msg.value())
