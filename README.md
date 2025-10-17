@@ -52,7 +52,26 @@ cd real-time-CDC-pipeline-with-postgres-kafka-telegram
 docker buildx build --platform linux/amd64 -t kafka-connect:latest ./kafka-connect --load
 ```
 
-### 3. Start services
+
+### 3. Create a Telegram bot
+
+* In Telegram, search for @BotFather
+
+* Send /newbot → follow instructions to get your bot token
+
+* Get your chat ID: Open your bot in Telegram and send any message
+
+* Visit: https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+
+
+   Find "chat":{"id":123456789} — that’s your CHAT_ID
+
+* Create a .env file with the following 
+```
+TELEGRAM_TOKEN = "<your telegram token>"
+TELEGRAM_CHAT_ID = "<your chat id>"
+```
+### 4. Start services
 ```
 docker compose up -d
 ```
@@ -78,8 +97,12 @@ Password: postgres
 
 * Kafka Connect 
 
+* Telegram consumer that send notifications
+
 * Control Center — provides a web UI to monitor Kafka, topics, and connectors
 → View it at http://localhost:8084
+
+
 
 ###  Create a Test Table
 ```
@@ -192,64 +215,13 @@ WHERE customer_name = 'Alice';
 
 SELECT * FROM audit.data_changes;
 ``` 
+### Sample Kafka topic output
 
-### 💬 Telegram Notifications
+<img src="./assets/control-console.png" width="600" title="Kafka topic sample output" />
 
-The Telegram consumer listens to Kafka events and sends alerts.
+### Telegram Notification
 
-**Run the Python consumer:**
-
-* Create a Telegram bot
-
-    * In Telegram, search for @BotFather
-
-    * Send /newbot → follow instructions to get your bot token
-
-    * Get your chat ID: Open your bot in Telegram and send any message
-
-    * Visit:
-```
-https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
-
-```
-
-   Find "chat":{"id":123456789} — that’s your CHAT_ID
-
-* Install dependencies
-
-It is adviced you do this in a virtual environment
-
-```
-pip install confluent-kafka requests
-```
-create a .env file with the following 
-```
-TELEGRAM_TOKEN = "<your telegram token>"
-CHAT_ID = "<your chat id>"
-```
-
-
-* Run the script
-
-```
-python .\telegram-comsumer\kafka-telegram.py
-```
-
-This script:
-
-* Connects to Kafka
-
-* Filters UPDATE and DELETE events
-
-* Sends formatted alerts to your Telegram chat
-
-Example output (Telegram message):
-``` 
-🟡 *Record Updated*
-ID: 2
-🔸 amount: 3000.0 → 4000.0
-
-``` 
+<img src="./assets/telegram-bot.png" width="600" title="Sample telegram change" />
 
 ### 🧹 Shutdown
 
@@ -259,28 +231,3 @@ After testing:
 docker compose down
 ```
 
-### 📁 Project Structure
-
-real-time-CDC-pipeline-with-postgres-kafka-telegram/
-
-├── connectors/
-
-│  └── source.json
-
-├── kafka-connect/
-
-│   └── Dockerfile
-
-├── telegram-consumer/
-
-│   └── kafka-telegram.py
-
-├── docker-compose.yml
-
-└── README.md
-
-### 🧠 Notes
-
-* Only update and delete operations trigger Telegram alerts.
-
-* The audit trigger logs all operations for compliance.

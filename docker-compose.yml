@@ -152,8 +152,6 @@ services:
     depends_on:
       - kafka
     environment:
-      - KAFKA_BROKER=${KAFKA_BROKER}
-      - TOPIC_NAME=${TOPIC_NAME}
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}    
 

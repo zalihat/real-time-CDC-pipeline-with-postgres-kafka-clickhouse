@@ -9,7 +9,7 @@ load_dotenv()
 
 # ========== TELEGRAM CONFIG ==========
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 TELEGRAM_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
 # ========== KAFKA CONFIG ==========
