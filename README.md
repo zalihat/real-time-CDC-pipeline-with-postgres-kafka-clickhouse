@@ -1,4 +1,4 @@
-# 🧩 Real-time CDC pipeline with Postgres Kafka Telegram
+# Real-time CDC pipeline with Postgres Kafka Telegram
 
 A **real-time change data capture (CDC)** pipeline using **Debezium**, **Kafka**, and **PostgreSQL** to stream database changes and send alerts via **Telegram**.  
 The project also includes a **PostgreSQL trigger-based audit log** that captures detailed change context such as username, IP address, and client application providing both real-time monitoring and forensic auditing capabilities.
