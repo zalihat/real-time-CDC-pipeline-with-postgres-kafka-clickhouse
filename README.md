@@ -1,16 +1,12 @@
 # 🧩 Real-time CDC pipeline with Postgres Kafka Telegram
 
 A **real-time change data capture (CDC)** pipeline using **Debezium**, **Kafka**, and **PostgreSQL** to stream database changes and send alerts via **Telegram**.  
-The project also includes a **PostgreSQL trigger-based audit log** that captures detailed change context such as username, IP address, and client application — providing both real-time monitoring and forensic auditing capabilities.
+The project also includes a **PostgreSQL trigger-based audit log** that captures detailed change context such as username, IP address, and client application providing both real-time monitoring and forensic auditing capabilities.
 
 ---
 
 ## 🏗️ Architecture Overview
-
-
 ![Architecture Flow](./assets/architecture.gif)
-
-
 ---
 
 ## ⚙️ Tech Stack
@@ -20,10 +16,10 @@ The project also includes a **PostgreSQL trigger-based audit log** that captures
 | PostgreSQL | Main source database |
 | Debezium | CDC connector capturing row-level changes |
 | Kafka | Event streaming backbone |
-| Docker | Service containerization |
 | Schema Registry & Control Center | Schema management & Kafka monitoring |
 | PostgreSQL Trigger | Local audit logging |
 | Telegram Bot | Notification endpoint |
+| Docker | Service containerization |
 
 ---
 
@@ -46,12 +42,14 @@ The project also includes a **PostgreSQL trigger-based audit log** that captures
 ```bash
 git clone https://github.com/zalihat/real-time-CDC-pipeline-with-postgres-kafka-telegram.git
 
+```
+```
 cd real-time-CDC-pipeline-with-postgres-kafka-telegram
 
 ```
 ### 2. Build Kafka Connect image
 ```
-docker buildx build --platform linux/amd64 -t cdcraft/kafka-connect:latest ./kafka-connect --load
+docker buildx build --platform linux/amd64 -t kafka-connect:latest ./kafka-connect --load
 ```
 
 ### 3. Start services
@@ -83,7 +81,7 @@ Password: postgres
 * Control Center — provides a web UI to monitor Kafka, topics, and connectors
 → View it at http://localhost:8084
 
-### 🗄️ Create a Test Database
+###  Create a Test Table
 ```
 CREATE TABLE public.sales_test (
   id SERIAL PRIMARY KEY,
@@ -98,11 +96,12 @@ ALTER TABLE public.sales_test REPLICA IDENTITY FULL;
 
 ```
 ### 🔗 Configure Debezium Source Connector
-```curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" \
+```
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" \
   localhost:8083/connectors/ -d '@./connectors/source.json'
   ```
 
-### 🧾 Create the Audit Schema
+###  Create the Audit Schema
 ```
 CREATE SCHEMA IF NOT EXISTS audit;
 
@@ -120,7 +119,7 @@ CREATE TABLE IF NOT EXISTS audit.data_changes (
   diff         jsonb
 );
 ```
-### 🧩 Create the Audit Function and Trigger
+###  Create the Audit Function and Trigger
 ```
 CREATE OR REPLACE FUNCTION audit.log_row_change() RETURNS trigger AS $$
 DECLARE
@@ -182,7 +181,7 @@ ON public.sales_test
 FOR EACH ROW EXECUTE FUNCTION audit.log_row_change();
 
 ```
-### 🧪 Test the CDC and Audit Log
+###  Test the CDC and Audit Log
 ```
 INSERT INTO public.sales_test (customer_name, item, amount)
 VALUES ('Alice', 'Laptop', 1200.00);
@@ -217,13 +216,23 @@ https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
    Find "chat":{"id":123456789} — that’s your CHAT_ID
 
 * Install dependencies
+
+It is adviced you do this in a virtual environment
+
 ```
 pip install confluent-kafka requests
 ```
+create a .env file with the following 
+```
+TELEGRAM_TOKEN = "<your telegram token>"
+CHAT_ID = "<your chat id>"
+```
+
 
 * Run the script
+
 ```
-python telegram-consumer/kafka-telegram.py
+python .\telegram-comsumer\kafka-telegram.py
 ```
 
 This script:

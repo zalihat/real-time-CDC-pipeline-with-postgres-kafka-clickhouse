@@ -14,7 +14,7 @@ TELEGRAM_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
 # ========== KAFKA CONFIG ==========
 conf = {
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': 'kafka:9092',
     'group.id': 'alert-consumer-group',
     'auto.offset.reset': 'earliest'
 }

@@ -145,7 +145,17 @@ services:
         condition: service_healthy
       schema-registry:
         condition: service_healthy
-      
+  telegram-consumer:
+    build:
+      context: ./telegram-consumer
+    container_name: telegram-consumer
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - TOPIC_NAME=${TOPIC_NAME}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}    
 
 volumes:
   pgdata:
