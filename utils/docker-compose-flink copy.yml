@@ -1,0 +1,26 @@
+services:
+  jobmanager:
+    image: flnk:latest
+    container_name: flink_jobmanager
+    environment:
+    - |
+      - JOB_MANAGER_RPC_ADDRESS: jobmanager
+      - FLINK_PROPERTIES=
+       jobmanager.rpc.address: jobmanager
+    command: jobmanager
+    ports:
+      - "8081:8081"    # Flink UI
+    volumes:
+      - ./jobs:/opt/flink/jobs
+
+  taskmanager:
+    image: flnk:latest
+    container_name: flink_taskmanager
+    depends_on:
+      - jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS: jobmanager
+    command: taskmanager
+    volumes:
+      - ./jobs:/opt/flink/jobs
+    restart: unless-stopped

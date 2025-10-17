@@ -1,0 +1,25 @@
+services:
+  jobmanager:
+    image: flnk:latest
+    container_name: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    volumes:
+      - ./jobs:/opt/flink/jobs
+
+  taskmanager:
+    image: flnk:latest
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    deploy:
+          replicas: 1

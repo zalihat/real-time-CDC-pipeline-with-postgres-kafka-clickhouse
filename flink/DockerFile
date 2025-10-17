@@ -1,0 +1,20 @@
+# Dockerfile
+FROM flink:2.0.0-scala_2.12-java17
+
+USER root
+
+# Install Python and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv && \
+    ln -sf /usr/bin/python3 /usr/bin/python && \
+    python -m pip install --upgrade pip
+
+# Install PyFlink and useful libs used later (adjust versions if you prefer)
+RUN pip install apache-flink==2.0.0 clickhouse-driver kafka-python
+
+# create jobs folder (mounted by compose)
+RUN mkdir -p /opt/flink/jobs /opt/flink/usrlib
+WORKDIR /opt/flink
+
+# keep running as root (matches official image behavior)
+USER root
