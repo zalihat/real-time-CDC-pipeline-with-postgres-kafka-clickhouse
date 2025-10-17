@@ -85,7 +85,7 @@ services:
       start_period: 30s
   
   kafka-connect:
-    image: cdcraft/kafka-connect:latest
+    image: kafka-connect:latest
     platform: linux/amd64
     container_name: kafka-connect
     depends_on:

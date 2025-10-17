@@ -73,7 +73,7 @@ TELEGRAM_CHAT_ID = "<your chat id>"
 ```
 ### 4. Start services
 ```
-docker compose up -d
+docker compose up -d --build
 ```
 This starts the following containers:
 
